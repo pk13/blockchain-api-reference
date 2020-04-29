@@ -1,6 +1,6 @@
 import uuid
 from websocket import create_connection
-from utils import construct_order_object, OrderObject
+from src.utils import construct_order_object
 
 
 class BlockchainWebsocketClient():
