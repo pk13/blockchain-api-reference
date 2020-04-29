@@ -1,0 +1,9 @@
+[DEFAULT]
+Symbol = BTC-USD
+Mode = limit_orders
+Env = staging
+SpreadMultiplier = 10  # times the min price increment
+ApiKeyProd = <YOUR_KEY>
+ApiSecretProd = <YOUR_SECRET>
+ApiKeyStaging = <YOUR_KEY>
+ApiSecretStaging = <YOUR_SECRET>
