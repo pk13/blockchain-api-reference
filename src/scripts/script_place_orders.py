@@ -86,12 +86,12 @@ def place_market_order(sent_order, price_store, symbols_store):
 
 
 # Limit-orders
-def place_limit_order(open_orders_buy, open_orders_sell, side, prices_store, symbols_store):
+def place_limit_order(open_orders_buy, open_orders_sell, side, prices_store, symbol, symbols_store):
     clOrdID = ''
     if (mode == "limit_orders" and symbols_store != {} and prices_store != {}):
-        print(symbols_store['BTC-USD'])
+        print(symbols_store[symbol])
         try:
-            if symbols_store['BTC-USD'] != None and prices_store['BTC-USD'] != None:
+            if symbols_store[symbol] != None and prices_store[symbol] != None:
                 orderQty = (symbols_store[symbol]['min_order_size'] * 10 ** (
                     -symbols_store[symbol]['min_order_size_scale'])) * order_size_multiplier
                 clOrdID = client.create_new_limit_order(side=side, orderQty=orderQty, price=prices_store[symbol],
@@ -211,7 +211,7 @@ if __name__ == '__main__':
         if prices_store != {} and prices_store !={} and symbols_store != {} and balances_store != {} and (open_orders_buy < max_orders or open_orders_sell < max_orders):
             if open_orders_buy < max_orders:
                 side = 'buy'
-                clOrdID, open_orders_buy, open_orders_sell = place_limit_order(open_orders_buy, open_orders_sell, side, prices_store, symbols_store)
+                clOrdID, open_orders_buy, open_orders_sell = place_limit_order(open_orders_buy, open_orders_sell, side, prices_store, symbol, symbols_store)
                 raw_res = client.ws.recv() # make sure order is recorded on the orders_store
                 if raw_res != None:  # update any of the stores
                     res = parse_response(raw_res)
@@ -220,7 +220,7 @@ if __name__ == '__main__':
                 print('I placed buy orders at midprice ' + str(prices_store[symbol]))
             if open_orders_sell < max_orders:
                 side = 'sell'
-                clOrdID, open_orders_buy, open_orders_sell = place_limit_order(open_orders_buy, open_orders_sell, side, prices_store, symbols_store)
+                clOrdID, open_orders_buy, open_orders_sell = place_limit_order(open_orders_buy, open_orders_sell, side, prices_store, symbol, symbols_store)
                 raw_res = client.ws.recv() # make sure order is recorded on the orders_store
                 if raw_res != None:  # update any of the stores
                     res = parse_response(raw_res)
