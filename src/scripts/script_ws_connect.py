@@ -1,7 +1,11 @@
+import codecs
+import io
 import json
 import asyncio
 import configparser
-from src.blockchain_exchange_client import BlockchainWebsocketClient
+import pdb
+
+from src.client.blockchain_exchange_client import BlockchainWebsocketClient
 
 
 def derive_keys_from_config(env):
@@ -10,12 +14,12 @@ def derive_keys_from_config(env):
     api_secret = ''
     if env == 'prod':
         url = 'wss://ws.prod.blockchain.info/mercury-gateway/v1/ws'
-        api_key = config['ApiKeyProd']
-        api_secret = config['ApiSecretProd']
+        api_key = parser.get('DEFAULT', 'ApiKeyProd')
+        api_secret = parser.get('DEFAULT', 'ApiSecretProd')
     elif env == 'staging':
         url = 'wss://ws.staging.blockchain.info/mercury-gateway/v1/ws'
-        api_key = config['ApiKeyStaging']
-        api_secret = config['ApiSecretStaging']
+        api_key = parser.get('DEFAULT', 'ApiKeyStaging')
+        api_secret = parser.get('DEFAULT', 'ApiSecretStaging')
     else:
         pass
     return url, api_key, api_secret
@@ -69,7 +73,6 @@ async def process_responses():
     balances_store = {}
     orders_store = {}
     tob_store = {}
-    sent_order = False
 
     while (1):  # monolithic, single-threaded and event-driven arch
         result = client.ws.recv()
@@ -84,14 +87,15 @@ async def process_responses():
 
 
 if __name__ == '__main__':
-    config_all = configparser.ConfigParser()
-    config_all.read('config_params')
-    config = config_all['DEFAULT']
-
-    mode = config['Mode']
-    symbol = config['Symbol']
-    env = config['Env']
-    spread_multiplier = config['SpreadMultiplier']
+    # buf = io.StringIO('config_params.ini')
+    parser = configparser.SafeConfigParser()
+    parser.read('config_params.ini')
+    with codecs.open('../../config_params.ini', 'r', encoding='utf-8') as f:
+        parser.read_file(f)
+    mode = parser.get('DEFAULT', 'Mode')
+    symbol = parser.get('DEFAULT', 'Symbol')
+    env = parser.get('DEFAULT', 'Env')
+    spread_multiplier = parser.getfloat('DEFAULT', 'SpreadMultiplier')
     url, api_key, api_secret = derive_keys_from_config(env)
     client = BlockchainWebsocketClient(env, url, api_key, api_secret, symbol, spread_multiplier)
     client.connect()
